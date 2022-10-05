@@ -1,0 +1,29 @@
+
+Administrador (Email, Nome, Patrão)
+Patrão -> Administrador(Email)
+
+Acesso(Email,Cod)
+Email -> Administrador(Email)
+Cod -> Loteamento(Cod)
+
+Loteamento (Cod, Nome, end_CEP, end_Logradouro)
+
+Lote (Cod, Número, Quadra, Valor)
+Cod -> Loteamento(Cod)
+
+Compra (Cod, Número, ID!, Data_compra)
+Cod, Número - > Lote(Cod, Número)
+ID -> Cliente(ID)
+
+Parcela (Cod_Parcela, Valor, Data, Status, Número_da_Parcela, (Cod,Número)!)
+Cod, Número -> Compra(Cod, Número)
+
+Cliente (ID, Endereço , Status, Telefone1, Telefone2, [CPF], Nome, [CNPJ], Razão_Social)
+
+Empresa (CNPJ, Razão_Social) 
+
+Equipamento (Cod, Nome)
+Tem(CNPJ, Cod_Equip, Cod_Lote, Número)
+CNPJ -> Empresa(CNPJ)
+Cod_Equip -> Equipamento(Cod)
+Cod_Lote, Número -> Lote(Cod, Número)
