@@ -1,0 +1,96 @@
+-- ver o código dos lotes que foram comprados parcelados --
+SELECT DISTINCT L.COD
+FROM PARCELA P INNER JOIN LOTE L ON (L.COD = P.COD)
+
+-- ver quais os ids das compras de cada lote de acordo com seu numero --
+SELECT C.ID AS ID_COMPRA, L.NUMERO AS NUMERO_LOTE
+FROM COMPRA C INNER JOIN LOTE L ON (C.COD = L.COD)
+    WHERE C.NUMERO = L.NUMERO
+
+-- ver os nomes dos clientes que possuem mais de um lote, e quantos lotes tem --
+SELECT C.NOME, COUNT(*) AS QTD_LOTES_COMPRADOS
+FROM CLIENTE C INNER JOIN COMPRA M ON (C.ID = M.ID)
+GROUP BY C.NOME
+HAVING COUNT(*) > 1
+
+-- ver quantos administradores do tipo patrão existem --
+SELECT COUNT(*) AS QUANTIDADE_PATROES
+FROM ADMINISTRADOR
+WHERE PATRAO = EMAIL
+
+-- ver cep dos loteamentos que tem mais de 1 lote --
+SELECT L.END_CEP, COUNT(*) AS QTD_LOTES
+FROM LOTEAMENTO L INNER JOIN LOTE E ON (E.COD = L.COD)
+GROUP BY L.END_CEP
+HAVING COUNT(*) > 1
+
+-- ver compras feitas nos últimos 10 anos --
+SELECT *
+FROM COMPRA
+WHERE DATA_COMPRA > '01/JAN/12'
+
+-- projetar quem administra cada loteamento --
+SELECT *
+FROM ACESSO
+
+-- ver todos os ids dos clientes que compraram lote, qual lote compraram, em que data compraram e quem comprou com parcela, ordenado de acordo com a data de compra --
+SELECT C.ID, C.NUMERO, C.DATA_COMPRA, P.COD_PARCELA
+FROM COMPRA C LEFT OUTER JOIN PARCELA P ON (C.COD = P.COD) AND (C.NUMERO = P.NUMERO)
+ORDER BY DATA_COMPRA ASC
+
+-- ver lotes do mais barato para o mais caro --
+SELECT *
+FROM LOTE
+ORDER BY VALOR ASC
+
+-- ver CNPJ e nome de empresas com ao menos um equipamento em um lote --
+SELECT E.CNPJ, E.RAZAO_SOCIAL
+FROM EMPRESA E
+WHERE EXISTS
+(SELECT *
+FROM POSSUI P
+WHERE P.CNPJ = E.CNPJ)
+
+-- ver razão social da empresa que não possui equipamentos em lotes --
+SELECT RAZAO_SOCIAL
+FROM EMPRESA
+WHERE CNPJ NOT IN
+    (SELECT E.CNPJ
+    FROM EMPRESA E INNER JOIN POSSUI P ON (E.CNPJ = P.CNPJ))
+
+-- ver código, número e quadra dos lotes que pertencem ao mesmo loteamento que o lote com número 80 --
+SELECT COD, NUMERO, QUADRA
+FROM LOTE
+WHERE COD = 
+    (SELECT COD
+    FROM LOTE
+    WHERE NUMERO = '80')
+    
+-- ver código e número dos lotes que são da quadra A --
+SELECT COD, NUMERO
+FROM LOTE
+WHERE QUADRA = 'A'
+
+-- ver código, número, quadra e valor de todos os lotes menos o mais barato --
+SELECT COD, NUMERO, QUADRA, VALOR
+FROM LOTE
+WHERE VALOR <>
+    (SELECT MIN(VALOR)
+    FROM LOTE)
+
+-- ver código, número, quadra e valor de todos os lotes com valor maior do que todos os lotes do loteamento de código '887766' --
+SELECT COD, NUMERO, QUADRA, VALOR
+FROM LOTE
+WHERE VALOR > ALL
+    (SELECT VALOR
+    FROM LOTE
+    WHERE COD = '887766')
+
+-- ver código, número, quadra e valor de todos os lotes com valor menor do que o valor máximo dentro do loteamento de código '887766'--
+SELECT COD, NUMERO, QUADRA, VALOR
+FROM LOTE
+WHERE VALOR <
+    (SELECT MAX(VALOR)
+    FROM LOTE
+    WHERE COD = '887766')
+
